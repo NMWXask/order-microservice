@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/orders   # ??????: ???? 5433 ?????? 5432
+    username: user
+    password: secret
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: order-service
+      auto-offset-reset: earliest
+  cache:
+    type: redis
+  redis:
+    host: localhost
+    port: 6379
+
+server:
+  port: 8080
