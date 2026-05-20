@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class OrderStatusListener {
 
-    // ОШИБКА: слушает топик "order-events", а продюсер шлёт в "order_events"
     @KafkaListener(topics = "order-events", groupId = "order-service")
     public void onEvent(String message) {
         log.info("Received event: {}", message);

@@ -20,5 +20,5 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
-    private Order order;       // обратная связь – вызовет рекурсию при JSON
+    private Order order;
 }
