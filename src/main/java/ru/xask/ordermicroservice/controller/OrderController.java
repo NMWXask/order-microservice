@@ -2,6 +2,8 @@ package ru.xask.ordermicroservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.xask.ordermicroservice.dto.CreateOrderRequest;
+import ru.xask.ordermicroservice.dto.OrderResponse;
 import ru.xask.ordermicroservice.entity.Order;
 import ru.xask.ordermicroservice.service.OrderService;
 
@@ -14,9 +16,9 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        return orderService.createOrder(order);
+    @PostMapping("/create")
+    public OrderResponse createOrder(@RequestBody CreateOrderRequest createOrderRequest) {
+        return orderService.createOrder(createOrderRequest);
     }
 
     @GetMapping("/{id}")
