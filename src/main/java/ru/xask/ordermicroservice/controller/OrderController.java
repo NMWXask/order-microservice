@@ -2,7 +2,8 @@ package ru.xask.ordermicroservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.xask.ordermicroservice.entity.Order;
+import ru.xask.ordermicroservice.dto.OrderDto;
+import ru.xask.ordermicroservice.dto.OrderResponse;
 import ru.xask.ordermicroservice.service.OrderService;
 
 import java.util.List;
@@ -14,21 +15,18 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        return orderService.createOrder(order);
+    @PostMapping("/create")
+    public OrderResponse createOrder(@RequestBody OrderDto orderDto) {
+        return orderService.createOrder(orderDto);
     }
 
     @GetMapping("/{id}")
-    public Order getOrder(@PathVariable Long id) {
-        Order order = orderService.getOrderById(id);
-        return order;
+    public OrderResponse getOrder(@PathVariable Long id) {
+        return orderService.getOrderById(id);
     }
 
     @GetMapping("/by-status")
-    public List<Order> getOrdersByStatus(@RequestParam String status) {
-        List<Order> orders = orderService.getAllOrdersByStatus(status);
-        orders.forEach(o -> System.out.println("Items count: " + o.getItems().size()));
-        return orders;
+    public List<OrderResponse> getOrdersByStatus(@RequestParam String status) {
+        return orderService.getAllOrdersByStatus(status);
     }
 }
