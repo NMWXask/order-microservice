@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.xask.ordermicroservice.dto.OrderDto;
 import ru.xask.ordermicroservice.dto.OrderResponse;
-import ru.xask.ordermicroservice.entity.Order;
 import ru.xask.ordermicroservice.service.OrderService;
 
 import java.util.List;

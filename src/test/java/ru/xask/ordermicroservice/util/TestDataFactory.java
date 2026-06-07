@@ -7,7 +7,8 @@ import java.util.List;
 
 public final class TestDataFactory {
 
-    private TestDataFactory() {}
+    private TestDataFactory() {
+    }
 
     public static OrderDto createDefaultOrderDto() {
         return OrderDto.builder()

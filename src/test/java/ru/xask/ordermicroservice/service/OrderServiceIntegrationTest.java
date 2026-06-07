@@ -44,14 +44,11 @@ public class OrderServiceIntegrationTest {
 
     @Test
     void shouldSendOrderCreatedEventToKafka() {
-        // 1. Создаём тестовый заказ через фабрику
         OrderDto orderDto = TestDataFactory.createDefaultOrderDto();
 
-        // 2. Вызываем метод сервиса, который отправляет событие
         OrderResponse response = orderService.createOrder(orderDto);
         Long orderId = response.id();
 
-        // 3. Используем утилиту для проверки наличия сообщения в топике
         boolean messageFound = KafkaConsumerHelper.waitForMessage(
                 kafka,
                 "order_events",
@@ -59,7 +56,6 @@ public class OrderServiceIntegrationTest {
                 Duration.ofSeconds(5)
         );
 
-        // 4. Проверяем результат
         assertThat(messageFound)
                 .withFailMessage("Не найдено сообщение OrderCreated:%d в топике order_events", orderId)
                 .isTrue();
@@ -68,21 +64,18 @@ public class OrderServiceIntegrationTest {
     @Test
     @Transactional
     void shouldCreateOrderAndSendOrderCreatedEventToKafka() {
-        // 1. Подготовка тестовых данных через фабрику
+
         OrderDto orderDto = TestDataFactory.createDefaultOrderDto();
 
-        // 2. Вызов тестируемого метода
         OrderResponse response = orderService.createOrder(orderDto);
         Long orderId = response.id();
 
-        // 3. Проверка возвращаемого ответа
         assertThat(response.id()).isNotNull();
         assertThat(response.customerName()).isEqualTo(orderDto.customerName());
         assertThat(response.status()).isEqualTo(orderDto.status());
         assertThat(response.items()).hasSize(1);
         assertThat(response.items().get(0).productName()).isEqualTo("Laptop");
 
-        // 4. Проверка, что заказ реально сохранился в БД
         Optional<Order> savedOrderOpt = orderRepository.findById(orderId);
         assertThat(savedOrderOpt).isPresent();
         Order savedOrder = savedOrderOpt.get();
@@ -91,7 +84,6 @@ public class OrderServiceIntegrationTest {
         assertThat(savedOrder.getItems()).hasSize(1);
         assertThat(savedOrder.getItems().get(0).getProductName()).isEqualTo("Laptop");
 
-        // 5. Проверка, что событие отправлено в Kafka
         boolean messageFound = KafkaConsumerHelper.waitForMessage(
                 kafka,
                 "order_events",

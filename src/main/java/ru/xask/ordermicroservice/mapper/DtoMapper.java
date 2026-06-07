@@ -12,5 +12,6 @@ import ru.xask.ordermicroservice.entity.Order;
 public interface DtoMapper {
 
     Order toEntity(OrderDto orderDto);
+
     OrderResponse toResponse(Order order);
 }
