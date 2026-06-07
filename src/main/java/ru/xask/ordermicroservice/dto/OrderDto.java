@@ -1,7 +1,6 @@
 package ru.xask.ordermicroservice.dto;
 
 import lombok.Builder;
-
 import java.util.List;
 
 @Builder
