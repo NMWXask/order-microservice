@@ -1,12 +1,14 @@
 package ru.xask.ordermicroservice.dto;
 
 import lombok.Builder;
-import ru.xask.ordermicroservice.entity.Order;
-import ru.xask.ordermicroservice.entity.OrderItem;
+
+import java.util.List;
 
 @Builder
 public record OrderResponse(
-        Order orderDto,
-        OrderItem itemDto
+        Long id,
+        String customerName,
+        String status,
+        List<OrderItemDto> items
 ) {
 }
