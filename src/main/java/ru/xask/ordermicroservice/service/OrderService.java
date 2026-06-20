@@ -3,10 +3,13 @@ package ru.xask.ordermicroservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.xask.ordermicroservice.entity.Order;
 import ru.xask.ordermicroservice.entity.OrderItem;
+import ru.xask.ordermicroservice.exception.OrderNotFoundException;
 import ru.xask.ordermicroservice.repository.OrderItemRepository;
 import ru.xask.ordermicroservice.repository.OrderRepository;
+import ru.xask.ordermicroservice.strategy.OrderStatusStrategyImpl;
 
 import java.util.List;
 
@@ -17,6 +20,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final KafkaProducerService kafkaProducer;
+    private final OrderStatusStrategyImpl orderStatusStrategyImpl;
 
 
     public Order createOrder(Order order) {
@@ -56,17 +60,25 @@ public class OrderService {
      * Если переход недопустим – выбросить кастомное исключение IllegalOrderStatusTransitionException с понятным сообщением.
      * При успешном обновлении отправить событие "OrderStatusChanged" с ID заказа через KafkaProducerService (предварительно исправив имя топика на единое).
      */
+    @Transactional
     public void updateOrderStatus(Long orderId, String newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Заказ не найден: " + orderId));
 
+        orderStatusStrategyImpl.validateTransition(order.getStatus(), newStatus);
+
+        order.setStatus(newStatus.toUpperCase());
+        orderRepository.save(order);
+        kafkaProducer.sendOrderEvent("OrderStatusChanged", orderId);
     }
 
     /**
-     Реализовать метод по фильтрации заказов по категории товара и минимальной сумме
-     Вернуть заказы, которые содержат хотя бы один товар с заданной категорией.
-     Сумма всего заказа (цена * количество всех позиций) не меньше minTotal.
+     * Реализовать метод по фильтрации заказов по категории товара и минимальной сумме
+     * вернуть заказы, которые содержат хотя бы один товар с заданной категорией.
+     * Сумма всего заказа (цена * количество всех позиций) не меньше minTotal.
      */
     public List<Order> findOrdersByCategoryAndMinTotal(String category, double minTotal) {
-
+        return null;
     }
 
     /**

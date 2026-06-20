@@ -1,6 +1,7 @@
 package ru.xask.ordermicroservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.xask.ordermicroservice.entity.Order;
 import ru.xask.ordermicroservice.service.OrderService;
@@ -30,5 +31,11 @@ public class OrderController {
         List<Order> orders = orderService.getAllOrdersByStatus(status);
         orders.forEach(o -> System.out.println("Items count: " + o.getItems().size()));
         return orders;
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<String> updateOrderStatus(@PathVariable Long id, @RequestParam String newStatus) {
+        orderService.updateOrderStatus(id, newStatus);
+        return ResponseEntity.ok("Статус обновлён, событие отправлено");
     }
 }
