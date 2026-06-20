@@ -1,28 +1,16 @@
 spring:
-  application:
-    name: order-microservice
   datasource:
-    url: jdbc:postgresql://localhost:5432/orders
+    url: jdbc:postgresql://localhost:5432/orders   # ??????: ???? 5433 ?????? 5432
     username: user
     password: secret
   jpa:
     hibernate:
       ddl-auto: create-drop
-      show-sql: true
+    show-sql: true
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
       group-id: order-service
       auto-offset-reset: earliest
-  cache:
-    type: redis
-  redis:
-  host: localhost
-  data:
-    redis:
-      port: 6379
 server:
   port: 8080
-logging:
-  level:
-    root: INFO

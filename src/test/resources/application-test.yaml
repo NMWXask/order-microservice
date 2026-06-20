@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -8,22 +8,6 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
-    show-sql: true
-  kafka:
-    # bootstrap-servers будет подставлен из контейнера через @DynamicPropertySource
-    admin:
-      auto-create-topics: true
-    consumer:
-      group-id: order-service-test
-      auto-offset-reset: earliest
-  cache:
-    type: none  # полностью отключаем Redis для тестов
-  data:
-    redis:
-      repositories:
-        enabled: false
-
-logging:
-  level:
-    ru.xask.ordermicroservice: DEBUG
-    org.springframework.kafka: INFO
+  # НЕ ОТКЛЮЧАЕМ KAFKA!
+  autoconfigure:
+    exclude:
