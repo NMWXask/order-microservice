@@ -15,3 +15,4 @@ public class KafkaProducerService {
         kafkaTemplate.send("order_events", message);
     }
 }
+

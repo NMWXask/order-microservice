@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    @Query("SELECT o FROM Order o WHERE o.orderStatus = :status")
+    @Query("SELECT o FROM Order o WHERE o.status = :status")
     List<Order> findByStatus(String status);
 }
