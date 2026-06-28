@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.xask.ordermicroservice.dto.OrderDto;
+import ru.xask.ordermicroservice.dto.OrderResponse;
 import ru.xask.ordermicroservice.entity.Order;
 import ru.xask.ordermicroservice.entity.OrderItem;
 import ru.xask.ordermicroservice.exception.OrderNotFoundException;
+import ru.xask.ordermicroservice.mapper.DtoMapper;
 import ru.xask.ordermicroservice.repository.OrderItemRepository;
 import ru.xask.ordermicroservice.repository.OrderRepository;
 import ru.xask.ordermicroservice.strategy.OrderStatusStrategyImpl;
@@ -21,9 +24,10 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final KafkaProducerService kafkaProducer;
     private final OrderStatusStrategyImpl orderStatusStrategyImpl;
+    private final DtoMapper dtoMapper;
 
-
-    public Order createOrder(Order order) {
+    public OrderResponse createOrder(OrderDto orderDto) {
+        Order order = dtoMapper.toEntity(orderDto);
         Order savedOrder = orderRepository.save(order);
         if (order.getItems() != null) {
             for (OrderItem item : order.getItems()) {
@@ -32,14 +36,14 @@ public class OrderService {
             }
         }
         kafkaProducer.sendOrderEvent("OrderCreated", savedOrder.getId());
-        return savedOrder;
+        return dtoMapper.toResponse(savedOrder);
     }
 
     @Cacheable(value = "orders", key = "#id")
-    public Order getOrderById(Long id) {
-        return orderRepository.findById(id).orElse(null);
+    public OrderResponse getOrderById(Long id) {
+        Order order = orderRepository.findById(id).orElse(null);
+        return dtoMapper.toResponse(order);
     }
-
 
     public double calculateTotalPrice(Order order) {
         return order.getItems().stream()
@@ -47,9 +51,10 @@ public class OrderService {
                 .sum();
     }
 
-
-    public List<Order> getAllOrdersByStatus(String status) {
-        return orderRepository.findByStatus(status);
+    public List<OrderResponse> getAllOrdersByStatus(String status) {
+        return orderRepository.findByStatus(status).stream()
+                .map(dtoMapper::toResponse)
+                .toList();
     }
 
     /**
@@ -77,8 +82,9 @@ public class OrderService {
      * вернуть заказы, которые содержат хотя бы один товар с заданной категорией.
      * Сумма всего заказа (цена * количество всех позиций) не меньше minTotal.
      */
-    public List<Order> findOrdersByCategoryAndMinTotal(String category, double minTotal) {
-        return null;
+    public List<OrderResponse> findOrdersByCategoryAndMinTotal(String category, double minTotal) {
+        // TODO: реализовать гибридный подход
+        return List.of();
     }
 
     /**
