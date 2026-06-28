@@ -36,4 +36,11 @@ public class OrderController {
         orderService.updateOrderStatus(id, newStatus);
         return ResponseEntity.ok("Статус обновлён, событие отправлено");
     }
+
+    @GetMapping("/filter")
+    public List<OrderResponse> findOrdersByCategoryAndMinTotal(
+            @RequestParam String category,
+            @RequestParam double minTotal) {
+        return orderService.findOrdersByCategoryAndMinTotal(category, minTotal);
+    }
 }
