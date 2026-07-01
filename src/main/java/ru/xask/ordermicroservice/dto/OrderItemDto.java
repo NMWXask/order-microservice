@@ -9,7 +9,6 @@ public record OrderItemDto(
         String productName,
         String category,
         double price,
-        int quantity,
-        Order order
+        int quantity
 ) {
 }
