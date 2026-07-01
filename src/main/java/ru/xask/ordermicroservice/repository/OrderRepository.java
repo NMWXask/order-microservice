@@ -10,4 +10,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT o FROM Order o WHERE o.status = :status")
     List<Order> findByStatus(String status);
+
+    @Query("SELECT DISTINCT o FROM Order o JOIN FETCH o.items i WHERE o.id IN :itemIds")
+    List<Order> findOrdersByItemIds(List<Long> itemIds);
 }

@@ -1,6 +1,7 @@
 package ru.xask.ordermicroservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +15,12 @@ import ru.xask.ordermicroservice.repository.OrderItemRepository;
 import ru.xask.ordermicroservice.repository.OrderRepository;
 import ru.xask.ordermicroservice.strategy.OrderStatusStrategyImpl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -83,8 +86,32 @@ public class OrderService {
      * Сумма всего заказа (цена * количество всех позиций) не меньше minTotal.
      */
     public List<OrderResponse> findOrdersByCategoryAndMinTotal(String category, double minTotal) {
-        // TODO: реализовать гибридный подход
-        return List.of();
+        List<Long> orderIds = orderItemRepository.findDistinctOrderIdsByCategory(category);
+
+        if (orderIds == null || orderIds.isEmpty()) {
+            log.info("No orders found for category: {}", category);
+            return List.of();
+        }
+
+        List<Order> orders = orderRepository.findOrdersByItemIds(orderIds);
+
+        if (orders == null || orders.isEmpty()) {
+            log.info("No orders loaded for ids: {}", orderIds);
+            return List.of();
+        }
+
+        BigDecimal minTotalAmount = BigDecimal.valueOf(minTotal);
+
+        return orders.stream()
+                .filter(order -> {
+                    BigDecimal total = order.getItems().stream()
+                            .map(item -> BigDecimal.valueOf(item.getPrice())
+                                    .multiply(BigDecimal.valueOf(item.getQuantity())))
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    return total.compareTo(minTotalAmount) >= 0;
+                })
+                .map(dtoMapper::toResponse)
+                .toList();
     }
 
     /**
@@ -115,4 +142,5 @@ public class OrderService {
         }
         return 0;
     }
+
 }
